@@ -40,8 +40,8 @@ print(f"\nEntities without Code (geographical regions):")
 print(df_co2_emissions_per_capita[df_co2_emissions_per_capita['Code'].isna()]['Entity'].unique())
 print("-"*80)
 
-# 1.2 Total CO2 emissions
-print("\n1.2 Total CO2 Emissions:")
+# 1.2 CO2 emissions
+print("\n1.2 CO2 emissions:")
 print(f"Shape: {df_co2_emissions.shape}")
 print(f"Missing values:\n{df_co2_emissions.isna().sum()}")
 print(f"\nEntities without Code (geographical regions):")
@@ -58,7 +58,7 @@ df_co2_emissions_per_capita = df_co2_emissions_per_capita.rename(
     columns={'CO₂ emissions per capita': 'CO2 emissions per capita'}
 )
 df_co2_emissions = df_co2_emissions.rename(
-    columns={'Annual CO₂ emissions': 'Total CO2 emissions'}
+    columns={'Annual CO₂ emissions': 'CO2 emissions'}
 )
 
 # Merge datasets
@@ -98,19 +98,19 @@ print(f">>> Income groups dataset: {df_co2_emissions_income.shape}")
 print("-"*80)
 print("\n[Step 3] Feature Understanding - Creating Visualizations")
 
-# 3.1 Total CO2 Emissions per Continent
-print("\n3.1 Plotting Total CO2 Emissions per Continent...")
+# 3.1 CO2 emissions per Continent
+print("\n3.1 Plotting CO2 emissions per Continent...")
 fig, ax = plt.subplots(figsize=(14, 7))
 entities = df_co2_emissions_continents['Entity'].unique()
 colors = sns.color_palette("dark", len(entities))
 for i, continent in enumerate(entities):
     data = df_co2_emissions_continents[df_co2_emissions_continents['Entity'] == continent]
-    ax.plot(data['Year'], data['Total CO2 emissions'], marker='o', 
+    ax.plot(data['Year'], data['CO2 emissions'], marker='o', 
             label=continent, linewidth=2, markersize=4, color=colors[i])
 
 ax.set_xlabel('Year', fontsize=12, fontweight='bold')
-ax.set_ylabel('Total CO2 emissions', fontsize=12, fontweight='bold')
-ax.set_title('Total CO2 Emissions Per Continent', fontsize=14, fontweight='bold', pad=20)
+ax.set_ylabel('CO2 emissions', fontsize=12, fontweight='bold')
+ax.set_title('CO2 emissions Per Continent', fontsize=14, fontweight='bold', pad=20)
 ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', frameon=True, fontsize=10)
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
