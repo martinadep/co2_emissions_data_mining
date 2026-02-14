@@ -1,7 +1,7 @@
 import time
 import numpy as np
 from pyspark.sql import SparkSession
-import os
+import sys
 
 
 def closest_idx(p, centroids):
@@ -37,7 +37,12 @@ def kmeans_optimized(rdd, k, max_iter=20, eps=1e-4):
 
 
 def run_scalability_test():
-    n_cores = os.cpu_count()
+    if len(sys.argv) > 1:
+        n_cores = int(sys.argv[1])
+    else:
+        print("Error: specify number of cores (e.g.: python k-means_parallel.py 4)")
+        sys.exit(1)
+
     print("Partitions:", rdd.getNumPartitions())
     print("Default parallelism:", spark.sparkContext.defaultParallelism)
     
@@ -53,9 +58,10 @@ def run_scalability_test():
         .getOrCreate()
     )
 
-    rdd = spark.sparkContext.range(n_points, numSlices=2*n_cores) \
+    rdd = spark.sparkContext.range(n_points, numSlices=n_cores) \
     .map(lambda _: np.random.randn(dim).astype("f")) \
     .cache()
+    rdd.count()  # Force caching
 
     start = time.perf_counter()
     kmeans_optimized(rdd, k=3)
