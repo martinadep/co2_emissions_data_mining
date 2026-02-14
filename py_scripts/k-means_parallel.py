@@ -43,13 +43,6 @@ def run_scalability_test():
         print("Error: specify number of cores (e.g.: python k-means_parallel.py 4)")
         sys.exit(1)
 
-    print("Partitions:", rdd.getNumPartitions())
-    print("Default parallelism:", spark.sparkContext.defaultParallelism)
-    
-    np.random.seed(42)
-    n_points = 1_000_000
-    dim = 2
-
     spark = (
         SparkSession.builder
         .master(f"local[{n_cores}]")
@@ -58,9 +51,16 @@ def run_scalability_test():
         .getOrCreate()
     )
 
+    np.random.seed(42)
+    n_points = 1000000
+    dim = 2
+
     rdd = spark.sparkContext.range(n_points, numSlices=n_cores) \
-    .map(lambda _: np.random.randn(dim).astype("f")) \
-    .cache()
+        .map(lambda _: np.random.randn(dim).astype("f")) \
+        .cache()
+    print(f"--- DEBUG TEST: {n_cores} CORES ---")
+    print("Default parallelism:", spark.sparkContext.defaultParallelism)
+    print("Partitions in RDD:", rdd.getNumPartitions())
     rdd.count()  # Force caching
 
     start = time.perf_counter()
