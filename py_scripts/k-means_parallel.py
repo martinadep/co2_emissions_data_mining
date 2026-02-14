@@ -43,8 +43,8 @@ def run_scalability_test():
         .config("spark.driver.memory", "16g") \
         .getOrCreate()
     
-    rdd = spark.sparkContext.parallelize(data_np).cache()
-    rdd.count() 
+    rdd = spark.sparkContext.parallelize(data_np, numSlices=n_cores).cache()
+    rdd.count()
     
     start = time.time()
     kmeans_optimized(rdd, k=3)
