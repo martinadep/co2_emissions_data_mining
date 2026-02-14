@@ -38,12 +38,12 @@ def kmeans_optimized(rdd, k, max_iter=20, eps=1e-4):
 
 def run_scalability_test():
     n_cores = int(os.environ.get("PBS_NP", 1))
-
+    print("Partitions:", rdd.getNumPartitions())
+    print("Default parallelism:", spark.sparkContext.defaultParallelism)
+    
     np.random.seed(42)
-
     n_points = 1_000_000
     dim = 2
-    data_np = np.random.randn(n_points, dim).astype("f")
 
     spark = (
         SparkSession.builder
@@ -53,8 +53,9 @@ def run_scalability_test():
         .getOrCreate()
     )
 
-    rdd = spark.sparkContext.parallelize(data_np, numSlices=2*n_cores).cache()
-    rdd.count()
+    rdd = spark.sparkContext.range(n_points, numSlices=2*n_cores) \
+    .map(lambda _: np.random.randn(dim).astype("f")) \
+    .cache()
 
     start = time.perf_counter()
     kmeans_optimized(rdd, k=3)
