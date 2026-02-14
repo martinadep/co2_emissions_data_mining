@@ -37,7 +37,7 @@ def kmeans_optimized(rdd, k, max_iter=20, eps=1e-4):
 
 
 def run_scalability_test():
-    n_cores = int(os.environ.get("PBS_NP", 1))
+    n_cores = os.cpu_count()
     print("Partitions:", rdd.getNumPartitions())
     print("Default parallelism:", spark.sparkContext.defaultParallelism)
     
