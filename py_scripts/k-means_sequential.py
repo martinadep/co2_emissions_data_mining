@@ -6,7 +6,7 @@ def closest_idx(p, centroids):
     return np.argmin(distances, axis=1)
 
 def kmeans_sequential(data, k, max_iter=20, eps=1e-4):
-    n_points, dim = data.shape
+    n_points, _ = data.shape
     
     indices = np.random.choice(n_points, k, replace=False)
     centroids = data[indices]

@@ -8,18 +8,18 @@ def closest_idx(p, centroids):
     return np.argmin(np.sum((centroids - p) ** 2, axis=1))
 
 
-def kmeans_optimized(rdd, k, max_iter=20, eps=1e-4):
+def kmeans_parallel(rdd, k, max_iter=20, eps=1e-4):
     centroids = np.array(rdd.takeSample(False, k))
 
     for _ in range(max_iter):
         br_centroids = rdd.context.broadcast(centroids)
 
+        # MAP (cluster assignment) + REDUCE (update)
         new_stats = (
             rdd.map(lambda p: (closest_idx(p, br_centroids.value), (p, 1)))
                .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
                .collectAsMap()
         )
-
         new_centroids = np.copy(centroids)
 
         for idx, (p_sum, count) in new_stats.items():
@@ -64,7 +64,7 @@ def run_scalability_test():
     rdd.count()  # Force caching
 
     start = time.perf_counter()
-    kmeans_optimized(rdd, k=3)
+    kmeans_parallel(rdd, k=3)
     end = time.perf_counter()
 
     print(f"CORES: {n_cores}")
