@@ -38,13 +38,10 @@ def kmeans_sequential(data, k, max_iter=20, eps=1e-4):
 
     return centroids
 
-def run_test():
+def run_test(n_points=1000000, dim=2, k=3):
     np.random.seed(21)
-    n_points = 1000000
-    dim = 2
-    k = 3
 
-    print(f"--- DEBUG TEST: SEQUENTIAL ---")
+    print(f"--- Sequential K-Means ---")
     print(f"Generating {n_points} points...")
     data = np.random.randn(n_points, dim).astype("f")
 
@@ -52,22 +49,28 @@ def run_test():
     final_centroids = kmeans_sequential(data, k=k)
     end = time.perf_counter()
 
-    print(f"CORES: 1 (Sequential)")
     print(f"TIME: {end-start:.4f}")
     print(f"Final Centroids:\n{final_centroids}")
 
     scikit_kmeans = KMeans(n_clusters=k, init='random', n_init=1, random_state=21)
     scikit_kmeans.fit(data)
+    print("Comparing with Scikit-Learn centroids...")
     print(f"Scikit KMeans Centroids:\n{scikit_kmeans.cluster_centers_}")
 
 
-def real_dataset_test(df_scaled):
+def real_dataset_test(df_scaled, k=3):
     start = time.perf_counter()
-    final_centroids = kmeans_sequential(df_scaled, k=3)
+    final_centroids = kmeans_sequential(df_scaled, k=k)
     end = time.perf_counter()
 
     print(f"TIME: {end-start:.4f} seconds")
     print(f"Final Centroids:\n{final_centroids}")
+
+    scikit_kmeans = KMeans(n_clusters=k, init='random', n_init=1, random_state=12)
+    scikit_kmeans.fit(df_scaled)
+
+    print("Comparing with Scikit-Learn centroids...")
+    print(f"Scikit KMeans Centroids:\n{scikit_kmeans.cluster_centers_}")
 
 
 if __name__ == "__main__":
@@ -80,9 +83,4 @@ if __name__ == "__main__":
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(df)
 
-    real_dataset_test(df_scaled)
-
-    scikit_kmeans = KMeans(n_clusters=3, init='random', n_init=1, random_state=12)
-    scikit_kmeans.fit(df_scaled)
-
-    print(f"Scikit KMeans Centroids:\n{scikit_kmeans.cluster_centers_}")
+    real_dataset_test(df_scaled, k=3)
